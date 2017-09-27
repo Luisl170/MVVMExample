@@ -1,4 +1,4 @@
-package mx.com.lania.mvvmexample.Services;
+package mx.com.lania.mvvmexample.Service;
 
 import java.util.List;
 

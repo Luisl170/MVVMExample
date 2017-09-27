@@ -1,9 +1,13 @@
 package mx.com.lania.mvvmexample.ViewModel;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
-import java.util.List;
-import mx.com.lania.mvvmexample.Model.User;
+import android.support.annotation.NonNull;
+
+import javax.inject.Inject;
+
+import mx.com.lania.mvvmexample.Model.ApiUserResponse;
 import mx.com.lania.mvvmexample.Repository.UserRepository;
 
 /**
@@ -12,17 +16,26 @@ import mx.com.lania.mvvmexample.Repository.UserRepository;
 
 public class UserViewModel extends ViewModel{
 
-    private LiveData<List<User>> users;
+    private MediatorLiveData<ApiUserResponse> mApiUserResponse;
     private UserRepository userRepository;
 
-    public UserViewModel() {
-        userRepository = new UserRepository();
+    @Inject
+    public UserViewModel(UserRepository userRepository) {
+        mApiUserResponse = new MediatorLiveData<>();
+        this.userRepository = userRepository;
     }
 
-    public LiveData<List<User>> getUsers() {
-        if (users == null)
-            users = userRepository.getUsers();
-        return users;
+    @NonNull
+    public LiveData<ApiUserResponse> getApiUserResponse() {
+        return mApiUserResponse;
+    }
+
+    public LiveData<ApiUserResponse> getUsers() {
+        mApiUserResponse.addSource(
+                userRepository.getUsers(),
+                apiUserResponse -> mApiUserResponse.setValue(apiUserResponse)
+        );
+        return mApiUserResponse;
     }
 
 }
